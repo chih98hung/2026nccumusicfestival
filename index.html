@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗 (最終版)</title>
+    <title>風塵卜卜</title>
     <style>
         /* CSS 樣式：設定全屏背景圖和按鈕位置 */
         body {
@@ -93,7 +93,7 @@
 <body>
 
 <div class="quiz-container">
-    <img id="quiz-image" src="cover.jpg" alt="測驗封面">
+    <img id="quiz-image" src="cover.png" alt="測驗封面">
     
     <div id="button-area">
         </div>
@@ -104,21 +104,21 @@
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
         '劉又熊': 'https://forms.gle/4C3PAuXNZKUm4CN98',   
-        '林易穎': 'https://forms.gle/5SHN6fTp3p6397vs8'    
+        '林易祺': 'https://forms.gle/5SHN6fTp3p6397vs8'    
     };
 
     const PAGE_IMAGES = [
-        'cover.jpg', 'intro.jpg', 'q1.jpg', 'q2.jpg', 'q3.jpg', 
-        'q4.jpg', 'q5.jpg', 'q6.jpg', 'gotoresult.jpg'
+        'cover.png', 'intro.png', 'q1.png', 'q2.png', 'q3.png', 
+        'q4.png', 'q5.png', 'q6.png', 'gotoresult.png'
     ];
     
     const RESULT_DETAILS = {
-        'R1': { file: 'result_star.jpg', lecture: '捏捏' },      
-        'R2': { file: 'result_sun.jpg', lecture: '捏捏' },       
-        'R3': { file: 'result_foggy.jpg', lecture: '劉又熊' },    
-        'R4': { file: 'result_sunset.jpg', lecture: '劉又熊' },   
-        'R5': { file: 'result_dawn.jpg', lecture: '林易穎' },     
-        'R6': { file: 'result_moon.jpg', lecture: '林易穎' }      
+        'R1': { file: 'result_star.png', lecture: '捏捏' },      
+        'R2': { file: 'result_sun.png', lecture: '捏捏' },       
+        'R3': { file: 'result_foggy.png', lecture: '劉又熊' },    
+        'R4': { file: 'result_sunset.png', lecture: '劉又熊' },   
+        'R5': { file: 'result_dawn.png', lecture: '林易祺' },     
+        'R6': { file: 'result_moon.png', lecture: '林易祺' }      
     };
 
     // --- 全局變數 ---
@@ -132,10 +132,10 @@
     // --- 程式碼優化：預先載入圖片 ---
     function preloadImages() {
         const imagesToPreload = [
-            'intro.jpg', 'gotoresult.jpg', 
-            'q1.jpg', 'q2.jpg', 'q3.jpg', 'q4.jpg', 'q5.jpg', 'q6.jpg', 
-            'result_star.jpg', 'result_sun.jpg', 'result_foggy.jpg', 
-            'result_sunset.jpg', 'result_dawn.jpg', 'result_moon.jpg' 
+            'intro.png', 'gotoresult.png', 
+            'q1.png', 'q2.png', 'q3.png', 'q4.png', 'q5.png', 'q6.png', 
+            'result_star.png', 'result_sun.png', 'result_foggy.png', 
+            'result_sunset.png', 'result_dawn.png', 'result_moon.png' 
         ];
         imagesToPreload.forEach(src => {
             const img = new Image();
@@ -274,3 +274,4 @@
 
 </body>
 </html>
+
