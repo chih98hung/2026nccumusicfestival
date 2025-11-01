@@ -131,5 +131,160 @@
         'R1': { file: 'result_star.png', lecture: '捏捏' },      
         'R2': { file: 'result_sun.png', lecture: '捏捏' },       
         'R3': { file: 'result_foggy.png', lecture: '劉又熊' },    
-        'R4': { file: 'result_sunset.png
+        'R4': { file: 'result_sunset.png', lecture: '劉又熊' },   
+        'R5': { file: 'result_dawn.png', lecture: '林易祺' },     
+        'R6': { file: 'result_moon.png', lecture: '林易祺' }      
+    };
 
+    // --- 全局變數 ---
+    let currentPage = 0; 
+    let userAnswers = []; 
+    let finalResultKey = '';
+
+    const quizImage = document.getElementById('quiz-image');
+    const buttonArea = document.getElementById('button-area');
+
+    // --- 程式碼優化：預先載入圖片 ---
+    function preloadImages() {
+        const imagesToPreload = [
+            'intro.png', 'gotoresult.png', 
+            'q1.png', 'q2.png', 'q3.png', 'q4.png', 'q5.png', 'q6.png', 
+            'result_star.png', 'result_sun.png', 'result_foggy.png', 
+            'result_sunset.png', 'result_dawn.png', 'result_moon.png' 
+        ];
+        imagesToPreload.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+    }
+    preloadImages(); 
+
+    // --- 函式：清除並設定圖片 ---
+    function setPageImage(imageFileName) {
+        quizImage.src = imageFileName;
+        buttonArea.innerHTML = ''; 
+    }
+
+    // --- 函式：處理頁面切換 (修正 intro.png 按鈕) ---
+    function navigate(nextPage) {
+        currentPage = nextPage;
+        if (currentPage < PAGE_IMAGES.length) {
+            setPageImage(PAGE_IMAGES[currentPage]);
+            
+            if (currentPage === 0) {
+                renderStartButton(() => navigate(1)); // 封面 -> 導言 (底部按鈕)
+            } else if (currentPage === 1) {
+                // 修正此處：intro.png 使用新的按鈕樣式 'start-quiz-button'
+                renderStartButton(() => navigate(2), 'start-quiz-button'); // 導言 -> Q1 (中間按鈕)
+            } else if (currentPage >= 2 && currentPage <= 7) {
+                renderQuizButtons(currentPage - 2); 
+            } else if (currentPage === 8) {
+                renderStartButton(calculateResult); // 確認結果 -> 結果頁 (底部按鈕)
+            }
+        } 
+    }
+
+    // --- 函式：繪製單一的啟動/確認按鈕 (無文字，可指定樣式) ---
+    function renderStartButton(callback, buttonClass = 'start-button') {
+        const button = document.createElement('button');
+        button.className = `option-button ${buttonClass}`; // 使用傳入的類別
+        button.innerHTML = ''; 
+        button.onclick = callback;
+        buttonArea.appendChild(button);
+    }
+
+    // --- 函式：繪製題目選項按鈕 (無文字) ---
+    function renderQuizButtons(questionIndex) {
+        const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
+        for (let i = 0; i < 4; i++) {
+            const button = document.createElement('button');
+            const answerValue = i + 1; 
+            
+            button.className = `option-button ${classes[i]}`;
+            button.innerHTML = ''; 
+            button.onclick = () => {
+                userAnswers[questionIndex] = answerValue;
+                if (questionIndex < 5) {
+                    navigate(currentPage + 1);
+                } else {
+                    navigate(8); 
+                }
+            };
+            buttonArea.appendChild(button);
+        }
+    }
+
+    // --- 函式：結果計算邏輯 ---
+    function calculateResult() {
+        const score = userAnswers.reduce((sum, current) => sum + current, 0);
+
+        let resultKey;
+        if (score <= 9) {
+            resultKey = 'R1'; 
+        } else if (score <= 12) {
+            resultKey = 'R2'; 
+        } else if (score <= 15) {
+            resultKey = 'R3'; 
+        } else if (score <= 18) {
+            resultKey = 'R4'; 
+        } else if (score <= 21) {
+            resultKey = 'R5'; 
+        } else {
+            resultKey = 'R6'; 
+        }
+        
+        finalResultKey = resultKey;
+        renderResultPage();
+    }
+
+    // --- 函式：繪製結果頁 (無文字) ---
+    function renderResultPage() {
+        currentPage = 9; 
+        const result = RESULT_DETAILS[finalResultKey];
+        setPageImage(result.file);
+
+        // 1. 分享按鈕 (左)
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'option-button result-btn-share';
+        shareBtn.innerHTML = ''; 
+        shareBtn.onclick = () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: '風塵卜卜：我的命運結果',
+                    text: '快來測測你的命運之聲！',
+                    url: window.location.href, 
+                }).catch(() => alert('分享功能失效，請長按圖片手動截圖並分享！'));
+            } else {
+                alert('請長按圖片手動截圖並分享到社群！'); 
+            }
+        };
+        buttonArea.appendChild(shareBtn);
+
+        // 2. 再玩一次按鈕 (中)
+        const replayBtn = document.createElement('button');
+        replayBtn.className = 'option-button result-btn-replay';
+        replayBtn.innerHTML = ''; 
+        replayBtn.onclick = () => {
+            userAnswers = []; 
+            navigate(0); 
+        };
+        buttonArea.appendChild(replayBtn);
+
+        // 3. 報名講座按鈕 (右)
+        const signupBtn = document.createElement('button');
+        signupBtn.className = 'option-button result-btn-signup';
+        signupBtn.innerHTML = ''; 
+        signupBtn.onclick = () => {
+            const lectureUrl = LECTURE_URLS[result.lecture];
+            window.open(lectureUrl, '_blank'); 
+        };
+        buttonArea.appendChild(signupBtn);
+    }
+
+    // --- 程式碼啟動點 ---
+    navigate(0);
+
+</script>
+
+</body>
+</html>
