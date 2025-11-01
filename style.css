@@ -1,126 +1,128 @@
+/* --- 基礎設定：手機優先 --- */
 body {
     font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: #0b0d1e; 
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow-y: auto; /* 允許垂直滾動 */
+    color: #fff;
 }
 
 .container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
+    max-width: 600px; 
     width: 100%;
     text-align: center;
+    padding: 10px; /* 手機微調邊距 */
 }
 
-/* 圖片顯示容器 */
-.image-display {
+/* --- 圖片與 Hotspot 容器 --- */
+.quiz-image-container {
+    position: relative;
     width: 100%;
-    margin-bottom: 20px;
-}
-
-/* 確保所有圖片響應式縮放 */
-#main-image {
-    width: 100%;
-    height: auto;
+    /* 圖片寬高比：根據您提供的直立圖，這裡使用一個較大的比例 */
+    padding-bottom: 165%; /* (圖片高度 / 圖片寬度) * 100% */
+    height: 0;
+    overflow: hidden;
     border-radius: 8px;
 }
 
-/* 頁面控制 */
-#control-page, #quiz-page, #result-page {
+#main-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 確保圖片在容器內完整顯示 */
+}
+
+/* --- Hotspot 點擊區域容器 --- */
+#hotspot-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 讓 Hotspot 點擊區域在圖片上層 */
+    z-index: 10; 
+}
+
+/* Hotspot 通用樣式：無邊框、完全透明 */
+.hotspot {
+    position: absolute;
+    background: transparent; 
+    border: none; /* 移除邊框，實現無文字介面 */
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+/* 偵錯/懸停樣式：在電腦上 hover 時給予視覺回饋 */
+.hotspot:hover {
+    background: rgba(255, 222, 112, 0.1); /* 輕微黃光提示可點擊 */
+}
+
+/* 非活動 Hotspot 隱藏 */
+.hotspot:not(.active) {
     display: none;
 }
-#control-page.active, #quiz-page.active, #result-page.active {
+
+
+/* --- 根據圖片精確測量的 Hotspot 位置 --- */
+
+/* 封面/導言/前往結果 的單一按鈕位置 (hotspot-a) */
+/* 按鈕位於圖片底部中央的橢圓形區域 */
+.hotspot.single-btn { 
+    top: 89%; 
+    left: 20%; 
+    width: 60%; 
+    height: 6%; 
+}
+
+/* 題目頁的四個選項位置 (q6.jpg 範例) */
+.hotspot.q-btn { 
+    width: 80%; 
+    height: 7%; 
+    left: 10%; 
+}
+#hotspot-a.q-btn { top: 46%; }
+#hotspot-b.q-btn { top: 57%; }
+#hotspot-c.q-btn { top: 68%; }
+#hotspot-d.q-btn { top: 79%; }
+
+
+/* --- 狀態和結果文字區域 (保持簡潔) --- */
+#result-text-area {
+    display: none;
+    padding: 20px;
+    margin-top: 10px;
+}
+#result-text-area.active {
     display: block;
 }
 
-/* 通用按鈕樣式 */
-button {
-    background-color: #7c79e6;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1em;
-    transition: background-color 0.3s;
-    width: 100%; 
-    max-width: 300px; 
-    margin-top: 10px;
-}
-
-button:hover {
-    background-color: #5a57a5;
-}
-
-/* 題目選項控制區樣式 */
-.option-controls {
-    text-align: center;
-}
-
-/* 選項點擊區域佈局：RWD 核心 */
-.options-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 電腦版兩欄 */
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.option-btn {
-    /* 選項按鈕特化：點擊區域 */
-    background-color: #e0e0f8;
-    color: #333;
+#reset-button {
+    background-color: #ffde70;
+    color: #1a1a1a;
     font-weight: bold;
-    padding: 20px; /* 增大點擊面積 */
-    max-width: none; /* 讓它們撐滿 grid 空間 */
+    padding: 10px 25px;
+    border-radius: 50px;
+    margin-top: 15px;
+    width: 80%;
+    max-width: 200px;
 }
 
-.option-btn:hover {
-    background-color: #c9c9e8;
-}
+.hidden { display: none !important; }
 
-/* 結果頁面樣式 */
-.result-layout h1 {
-    font-size: 2.5em;
-    color: #f7962c;
-    margin: 10px 0;
-}
-.result-layout p {
-    font-size: 1.2em;
-    line-height: 1.6;
-}
-
-h3#progress {
-    color: #888;
-    margin-bottom: 15px;
-}
-
-/* 💥 RWD Media Query：手機螢幕優化 */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-        min-height: 100vh;
-    }
-    
+/* --- 手機優化 (可選) --- */
+@media (max-width: 480px) {
     .container {
-        padding: 15px;
-        box-shadow: none; 
+        padding: 0; 
     }
-
-    /* 手機上將選項從兩欄改為一欄垂直堆疊 */
-    .options-grid {
-        grid-template-columns: 1fr; /* 手機版一欄 */
-        gap: 10px;
-    }
-
-    .option-btn {
-        padding: 18px 15px; /* 增大點擊面積 */
+    /* 確保手機上點擊區域大小不變 */
+    .hotspot {
+        border: none;
     }
 }
