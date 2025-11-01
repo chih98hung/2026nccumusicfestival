@@ -4,19 +4,19 @@ const LINK_GROUP_A = "https://your-external-link-A.com/lesson";
 const LINK_GROUP_B = "https://your-external-link-B.com/lesson";
 const LINK_GROUP_C = "https://your-external-link-C.com/lesson";
 
-// --- 測驗結果定義 (與您的圖片名稱完全對應，並新增 link 屬性) ---
+// --- 測驗結果定義 (與您的圖片名稱和連結完全對應) ---
 const results = [
-    // 0~4 分 -> 霧 (foggy)
+    // 0~4 分 -> 靜霧
     { scoreRange: [0, 4], title: "靜霧", resultImage: "result_foggy.jpg", link: LINK_GROUP_A },
-    // 5~9 分 -> 晨 (dawn)
+    // 5~9 分 -> 晨曦
     { scoreRange: [5, 9], title: "晨曦", resultImage: "result_dawn.jpg", link: LINK_GROUP_A }, 
-    // 10~14 分 -> 星 (star)
+    // 10~14 分 -> 辰星
     { scoreRange: [10, 14], title: "辰星", resultImage: "result_star.jpg", link: LINK_GROUP_B },
-    // 15~19 分 -> 月 (moon)
+    // 15~19 分 -> 幻月
     { scoreRange: [15, 19], title: "幻月", resultImage: "result_moon.jpg", link: LINK_GROUP_B },
-    // 20~24 分 -> 陽 (sun)
+    // 20~24 分 -> 朝陽
     { scoreRange: [20, 24], title: "朝陽", resultImage: "result_sun.jpg", link: LINK_GROUP_C },
-    // 25~30 分 -> 暉 (sunset)
+    // 25~30 分 -> 餘暉
     { scoreRange: [25, 30], title: "餘暉", resultImage: "result_sunset.jpg", link: LINK_GROUP_C }
 ];
 
@@ -36,7 +36,7 @@ let totalScore = 0;
 let finalResult = null; 
 let currentExternalLink = "";
 
-// 確保所有程式碼在 DOM 載入完成後執行 (解決卡住問題的關鍵)
+// 確保所有程式碼在 DOM 載入完成後執行
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 元素選取 ---
