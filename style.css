@@ -1,0 +1,126 @@
+body {
+    font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+/* 圖片顯示容器 */
+.image-display {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* 確保所有圖片響應式縮放 */
+#main-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* 頁面控制 */
+#control-page, #quiz-page, #result-page {
+    display: none;
+}
+#control-page.active, #quiz-page.active, #result-page.active {
+    display: block;
+}
+
+/* 通用按鈕樣式 */
+button {
+    background-color: #7c79e6;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
+    width: 100%; 
+    max-width: 300px; 
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #5a57a5;
+}
+
+/* 題目選項控制區樣式 */
+.option-controls {
+    text-align: center;
+}
+
+/* 選項點擊區域佈局：RWD 核心 */
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 電腦版兩欄 */
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.option-btn {
+    /* 選項按鈕特化：點擊區域 */
+    background-color: #e0e0f8;
+    color: #333;
+    font-weight: bold;
+    padding: 20px; /* 增大點擊面積 */
+    max-width: none; /* 讓它們撐滿 grid 空間 */
+}
+
+.option-btn:hover {
+    background-color: #c9c9e8;
+}
+
+/* 結果頁面樣式 */
+.result-layout h1 {
+    font-size: 2.5em;
+    color: #f7962c;
+    margin: 10px 0;
+}
+.result-layout p {
+    font-size: 1.2em;
+    line-height: 1.6;
+}
+
+h3#progress {
+    color: #888;
+    margin-bottom: 15px;
+}
+
+/* 💥 RWD Media Query：手機螢幕優化 */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+        min-height: 100vh;
+    }
+    
+    .container {
+        padding: 15px;
+        box-shadow: none; 
+    }
+
+    /* 手機上將選項從兩欄改為一欄垂直堆疊 */
+    .options-grid {
+        grid-template-columns: 1fr; /* 手機版一欄 */
+        gap: 10px;
+    }
+
+    .option-btn {
+        padding: 18px 15px; /* 增大點擊面積 */
+    }
+}
