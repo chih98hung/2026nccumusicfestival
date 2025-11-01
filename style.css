@@ -1,79 +1,16 @@
-/* --- 基礎設定：手機優先 --- */
-body {
-    font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
-    background-color: #0b0d1e; 
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow-y: auto; /* 允許垂直滾動 */
-    color: #fff;
-}
+/* --- Hotspot 點擊區域樣式 (承襲上次設定) --- */
+/* ... (保留 body, .container, .quiz-image-container 等樣式) ... */
 
-.container {
-    max-width: 600px; 
-    width: 100%;
-    text-align: center;
-    padding: 10px; /* 手機微調邊距 */
-}
-
-/* --- 圖片與 Hotspot 容器 --- */
-.quiz-image-container {
-    position: relative;
-    width: 100%;
-    /* 圖片寬高比：根據您提供的直立圖，這裡使用一個較大的比例 */
-    padding-bottom: 165%; /* (圖片高度 / 圖片寬度) * 100% */
-    height: 0;
-    overflow: hidden;
-    border-radius: 8px;
-}
-
-#main-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* 確保圖片在容器內完整顯示 */
-}
-
-/* --- Hotspot 點擊區域容器 --- */
-#hotspot-area {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* 讓 Hotspot 點擊區域在圖片上層 */
-    z-index: 10; 
-}
-
-/* Hotspot 通用樣式：無邊框、完全透明 */
+/* --- Hotspot 通用樣式 (承襲上次設定) --- */
 .hotspot {
     position: absolute;
     background: transparent; 
-    border: none; /* 移除邊框，實現無文字介面 */
+    border: none; /* 移除邊框 */
     cursor: pointer;
     transition: background-color 0.1s;
 }
 
-/* 偵錯/懸停樣式：在電腦上 hover 時給予視覺回饋 */
-.hotspot:hover {
-    background: rgba(255, 222, 112, 0.1); /* 輕微黃光提示可點擊 */
-}
-
-/* 非活動 Hotspot 隱藏 */
-.hotspot:not(.active) {
-    display: none;
-}
-
-
-/* --- 根據圖片精確測量的 Hotspot 位置 --- */
-
-/* 封面/導言/前往結果 的單一按鈕位置 (hotspot-a) */
-/* 按鈕位於圖片底部中央的橢圓形區域 */
+/* 封面/導言/前往結果 的單一按鈕位置 */
 .hotspot.single-btn { 
     top: 89%; 
     left: 20%; 
@@ -81,7 +18,7 @@ body {
     height: 6%; 
 }
 
-/* 題目頁的四個選項位置 (q6.jpg 範例) */
+/* 題目頁的四個選項位置 (q6.jpg 範例，承襲上次設定) */
 .hotspot.q-btn { 
     width: 80%; 
     height: 7%; 
@@ -92,37 +29,34 @@ body {
 #hotspot-c.q-btn { top: 68%; }
 #hotspot-d.q-btn { top: 79%; }
 
-
-/* --- 狀態和結果文字區域 (保持簡潔) --- */
-#result-text-area {
-    display: none;
-    padding: 20px;
-    margin-top: 10px;
-}
-#result-text-area.active {
-    display: block;
+/* --- ✨ 新增：結果頁三個 Hotspot 位置 (根據 result_*.jpg 圖片底部) --- */
+.hotspot.result-btn {
+    bottom: 0%; /* 從底部開始定位 */
+    height: 10%; /* 每個按鈕的高度佔圖片的 10% 左右 */
+    width: 30%; /* 每個按鈕的寬度佔圖片的 30% 左右 */
+    top: auto; /* 不使用 top 定位 */
+    /* 這裡使用 margin 確保它們在同一行 */
 }
 
-#reset-button {
-    background-color: #ffde70;
-    color: #1a1a1a;
-    font-weight: bold;
-    padding: 10px 25px;
-    border-radius: 50px;
-    margin-top: 15px;
-    width: 80%;
-    max-width: 200px;
+/* 結果頁 - 分享 (左) */
+#hotspot-a.result-btn {
+    left: 4%; 
 }
 
-.hidden { display: none !important; }
-
-/* --- 手機優化 (可選) --- */
-@media (max-width: 480px) {
-    .container {
-        padding: 0; 
-    }
-    /* 確保手機上點擊區域大小不變 */
-    .hotspot {
-        border: none;
-    }
+/* 結果頁 - 再玩一次 (中) */
+#hotspot-b.result-btn {
+    left: 35%; 
 }
+
+/* 結果頁 - 報名講座 (右) */
+#hotspot-c.result-btn {
+    left: 66%; 
+}
+
+/* 報名講座是第三個按鈕，但我們在程式碼中用 hotspot-c 表示，因此隱藏 hotspot-d */
+#hotspot-d.result-btn { 
+    display: none !important; 
+}
+
+
+/* ... (保留其他 RWD 和隱藏樣式) ... */
