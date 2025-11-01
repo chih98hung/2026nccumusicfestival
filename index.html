@@ -1,33 +1,284 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜：日曆心理測驗</title>
-    <link rel="stylesheet" href="style_final.css">
+    <title>風塵卜卜 - 命運測驗</title>
+    <style>
+        /* CSS 樣式：設定全屏背景圖和按鈕位置 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1226; /* 測驗主色調的背景 */
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 480px; /* 模擬手機或單頁App的寬度 */
+            position: relative;
+            /* 保持內容縱向居中，但避免圖片拉伸 */
+        }
+        #quiz-image {
+            width: 100%;
+            display: block;
+        }
+
+        /* 按鈕容器：位於圖片上方的絕對定位層 */
+        #button-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        /* 通用按鈕樣式 - 圖片中的按鈕 */
+        .option-button {
+            position: absolute;
+            width: 80%; /* 模擬圖片中選項按鈕的寬度 */
+            height: 7%; /* 模擬圖片中選項按鈕的高度 */
+            left: 10%;
+            background-color: transparent; /* 透明按鈕 */
+            border: none;
+            cursor: pointer;
+            z-index: 20; /* 確保按鈕可點擊 */
+        }
+        
+        /* 頁面特定按鈕的定位 */
+        
+        /* 封面/導言/確認結果頁的單一按鈕 */
+        .start-button {
+            top: 75%; /* 根據圖片位置調整 */
+            height: 7%;
+        }
+
+        /* 題目頁（q1-q6）的四個選項按鈕 */
+        .q-btn-a { top: 48.5%; height: 8%; }
+        .q-btn-b { top: 59%; height: 8%; }
+        .q-btn-c { top: 69.5%; height: 8%; }
+        .q-btn-d { top: 80%; height: 8%; }
+
+        /* 結果頁的三個按鈕 */
+        .result-btn-share {
+            top: 90%; 
+            left: 10%; 
+            width: 25%;
+            height: 7%;
+        }
+        .result-btn-replay {
+            top: 90%; 
+            left: 37.5%; 
+            width: 25%;
+            height: 7%;
+        }
+        .result-btn-signup {
+            top: 90%; 
+            left: 65%; 
+            width: 25%;
+            height: 7%;
+        }
+
+        /* 隱藏按鈕文字，只顯示視覺圖片 */
+        .option-button:hover {
+            opacity: 0.8; /* 懸停時略微透明，提供點擊反饋 */
+        }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <div class="quiz-image-container">
-            
-            <img id="main-image" src="cover.jpg" alt="測驗封面：長按圖片可儲存結果">
-
-            <div id="hotspot-area">
-                <button class="hotspot active" id="hotspot-a" data-value="0"></button>
-                <button class="hotspot" id="hotspot-b" data-value="0"></button>
-                <button class="hotspot" id="hotspot-c" data-value="0"></button>
-                <button class="hotspot" id="hotspot-d" data-value="0"></button>
-            </div>
-            
+<div class="quiz-container">
+    <img id="quiz-image" src="cover.jpg" alt="測驗封面">
+    
+    <div id="button-area">
         </div>
-        
-        <h3 id="progress" class="hidden">第 1/6 題</h3>
-        
-    </div>
+</div>
 
-    <script src="script_final.js"></script>
+<script>
+    // --- 測驗資料定義 ---
+    
+    // 講座連結 (請替換為真實的 URL)
+    const LECTURE_URLS = {
+        '捏捏': 'https://example.com/lecture/niennie', // L1
+        '劉又熊': 'https://example.com/lecture/liuyouhsiung', // L2
+        '林易穎': 'https://example.com/lecture/linyiying'  // L3
+    };
+
+    // 所有測驗頁面和結果頁面的圖片
+    const PAGE_IMAGES = [
+        'cover.jpg',        // 0: 封面
+        'intro.jpg',        // 1: 導言
+        'q1.jpg',           // 2: Q1
+        'q2.jpg',           // 3: Q2
+        'q3.jpg',           // 4: Q3
+        'q4.jpg',           // 5: Q4
+        'q5.jpg',           // 6: Q5
+        'q6.jpg',           // 7: Q6
+        'gotoresult.jpg'    // 8: 確認結果
+    ];
+    
+    // 結果圖片及其對應的講座
+    const RESULT_DETAILS = {
+        'R1': { file: 'result_star.jpg', lecture: '捏捏' },      // 辰星
+        'R2': { file: 'result_sun.jpg', lecture: '捏捏' },       // 朝陽
+        'R3': { file: 'result_foggy.jpg', lecture: '劉又熊' },    // 靜霧
+        'R4': { file: 'result_sunset.jpg', lecture: '劉又熊' },   // 餘暉
+        'R5': { file: 'result_dawn.jpg', lecture: '林易穎' },     // 辰曦
+        'R6': { file: 'result_moon.jpg', lecture: '林易穎' }      // 幻月
+    };
+
+    // --- 全局變數 ---
+    let currentPage = 0; // 0: cover, 1: intro, 2-7: Q1-Q6, 8: gotoresult, 9: result
+    let userAnswers = []; // 儲存 Q1-Q6 的答案 (A=1, B=2, C=3, D=4)
+    let finalResultKey = '';
+
+    // --- DOM 元素快取 ---
+    const quizImage = document.getElementById('quiz-image');
+    const buttonArea = document.getElementById('button-area');
+
+    // --- 函式：清除並設定圖片 ---
+    function setPageImage(imageFileName) {
+        quizImage.src = imageFileName;
+        buttonArea.innerHTML = ''; // 清除所有舊按鈕
+    }
+
+    // --- 函式：處理頁面切換 ---
+    function navigate(nextPage) {
+        currentPage = nextPage;
+        if (currentPage < PAGE_IMAGES.length) {
+            setPageImage(PAGE_IMAGES[currentPage]);
+            // 根據當前頁面繪製按鈕
+            if (currentPage === 0) {
+                renderStartButton('測驗開始', () => navigate(1));
+            } else if (currentPage === 1) {
+                renderStartButton('準備好了', () => navigate(2));
+            } else if (currentPage >= 2 && currentPage <= 7) {
+                renderQuizButtons(currentPage - 2); // 題目編號 0 到 5
+            } else if (currentPage === 8) {
+                renderStartButton('確認結果', calculateResult);
+            }
+        } else {
+            // 如果頁面索引超出範圍，則停留在結果頁 (currentPage = 9)
+        }
+    }
+
+    // --- 函式：繪製單一的啟動/確認按鈕 ---
+    function renderStartButton(text, callback) {
+        const button = document.createElement('button');
+        button.className = 'option-button start-button';
+        button.textContent = text; // 雖然不可見，但為了可訪問性保留
+        button.onclick = callback;
+        buttonArea.appendChild(button);
+    }
+
+    // --- 函式：繪製題目選項按鈕 ---
+    function renderQuizButtons(questionIndex) {
+        const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
+        for (let i = 0; i < 4; i++) {
+            const button = document.createElement('button');
+            const answerValue = i + 1; // 答案值 A=1, B=2, C=3, D=4
+            
+            button.className = `option-button ${classes[i]}`;
+            button.textContent = String.fromCharCode(65 + i); // 顯示 A, B, C, D (不可見)
+            button.onclick = () => {
+                userAnswers[questionIndex] = answerValue;
+                // 自動跳轉到下一題或結果頁
+                if (questionIndex < 5) {
+                    navigate(currentPage + 1);
+                } else {
+                    navigate(8); // Q6 結束後跳到確認結果頁
+                }
+            };
+            buttonArea.appendChild(button);
+        }
+    }
+
+    // --- 函式：結果計算邏輯 ---
+    function calculateResult() {
+        // 簡單的計分系統：每個選項賦予分數
+        // A=1, B=2, C=3, D=4
+        const score = userAnswers.reduce((sum, current) => sum + current, 0);
+
+        // 總分範圍： 6 (全 A) 到 24 (全 D)
+        let resultKey;
+
+        // --- 結果配對邏輯：可根據您的偏好調整分數範圍 ---
+        if (score <= 9) {
+            resultKey = 'R1'; // 辰星 (捏捏)
+        } else if (score <= 12) {
+            resultKey = 'R2'; // 朝陽 (捏捏)
+        } else if (score <= 15) {
+            resultKey = 'R3'; // 靜霧 (劉又熊)
+        } else if (score <= 18) {
+            resultKey = 'R4'; // 餘暉 (劉又熊)
+        } else if (score <= 21) {
+            resultKey = 'R5'; // 辰曦 (林易穎)
+        } else {
+            resultKey = 'R6'; // 幻月 (林易穎)
+        }
+        
+        finalResultKey = resultKey;
+        renderResultPage();
+    }
+
+    // --- 函式：繪製結果頁 ---
+    function renderResultPage() {
+        currentPage = 9; // 標記為結果頁
+        const result = RESULT_DETAILS[finalResultKey];
+        setPageImage(result.file);
+
+        // 1. 分享按鈕 (左)
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'option-button result-btn-share';
+        shareBtn.textContent = '分享';
+        shareBtn.onclick = () => {
+             // 嘗試使用 Web Share API (限 HTTPS 環境)
+            if (navigator.share) {
+                navigator.share({
+                    title: '風塵卜卜：我的命運結果是 ' + result.file.replace('result_', '').replace('.jpg', ''),
+                    text: '快來測測你的命運之聲！',
+                    url: window.location.href, // 分享當前測驗連結
+                }).catch((error) => console.log('分享失敗', error));
+            } else {
+                alert('請手動截圖並分享！'); // 預設的分享提示
+            }
+        };
+        buttonArea.appendChild(shareBtn);
+
+        // 2. 再玩一次按鈕 (中)
+        const replayBtn = document.createElement('button');
+        replayBtn.className = 'option-button result-btn-replay';
+        replayBtn.textContent = '再玩一次';
+        replayBtn.onclick = () => {
+            userAnswers = []; // 重設答案
+            navigate(0); // 返回封面頁
+        };
+        buttonArea.appendChild(replayBtn);
+
+        // 3. 報名講座按鈕 (右)
+        const signupBtn = document.createElement('button');
+        signupBtn.className = 'option-button result-btn-signup';
+        signupBtn.textContent = '報名講座';
+        signupBtn.onclick = () => {
+            const lectureUrl = LECTURE_URLS[result.lecture];
+            window.open(lectureUrl, '_blank'); // 在新分頁開啟講座連結
+        };
+        buttonArea.appendChild(signupBtn);
+
+        // 提示：長按儲存圖片
+        // 由於圖片本身就是 img 標籤，長按或右鍵即可觸發原生儲存功能。
+        // 無需額外 JavaScript 程式碼。
+    }
+
+    // --- 程式碼啟動點 ---
+    // 從封面頁開始
+    navigate(0);
+
+</script>
 
 </body>
 </html>
