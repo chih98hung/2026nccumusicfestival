@@ -3,41 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>圖片心理測驗</title>
-    <link rel="stylesheet" href="style.css">
+    <title>風塵卜卜</title>
+    <link rel="stylesheet" href="style_final.css">
 </head>
 <body>
 
     <div class="container">
-
-        <div class="image-display">
-            <img id="main-image" src="cover.png" alt="網站封面圖片：開始測驗">
-        </div>
-
-        <section id="control-page" class="active">
-            <button id="main-button" onclick="showIntroduction()">開始探索</button>
-        </section>
-
-        <section id="quiz-page" class="option-controls">
-            <h3 id="progress">第 1/6 題</h3>
+        
+        <div class="quiz-image-container">
             
-            <div id="options-container" class="options-grid">
-                <button class="option-btn" data-value="3">選項 A (點擊區域)</button>
-                <button class="option-btn" data-value="1">選項 B (點擊區域)</button>
-                <button class="option-btn" data-value="0">選項 C (點擊區域)</button>
-                <button class="option-btn" data-value="5">選項 D (點擊區域)</button>
-            </div>
-        </section>
+            <img id="main-image" src="cover.jpg" alt="測驗封面">
 
-        <section id="result-page" class="result-layout">
+            <div id="hotspot-area">
+                <button class="hotspot active" id="hotspot-a" data-value="0"></button>
+                <button class="hotspot" id="hotspot-b" data-value="0"></button>
+                <button class="hotspot" id="hotspot-c" data-value="0"></button>
+                <button class="hotspot" id="hotspot-d" data-value="0"></button>
+            </div>
+            
+        </div>
+        
+        <section id="result-text-area" class="result-layout">
             <h1 id="result-title"></h1>
             <p id="result-description"></p>
-            <button onclick="location.reload()">重新測驗</button>
+            <button id="reset-button" onclick="location.reload()">重新測驗</button>
         </section>
 
+        <h3 id="progress" class="hidden">第 1/6 題</h3>
+        
     </div>
 
-    <script src="script.js"></script>
+    <script src="script_final.js"></script>
 
 </body>
 </html>
