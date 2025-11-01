@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>風塵卜卜 - 命運測驗 (PNG 測試版)</title>
     <style>
-        /* CSS 樣式：設定全屏背景圖和按鈕位置 */
+        /* --- 關鍵修正：確保百分比定位有效 --- */
+        html, body {
+            height: 100%; /* 確保 HTML 和 BODY 佔據整個視窗高度 */
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -14,13 +18,16 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
+            /* 保持 flex 佈局，但確保高度正確 */
         }
         .quiz-container {
             width: 100%;
             max-width: 480px; 
+            min-height: 100%; /* 確保它能繼承 body 的高度 */
             position: relative;
         }
+        /* --- 關鍵修正結束 --- */
+
         #quiz-image {
             width: 100%;
             display: block;
@@ -32,19 +39,19 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100%; /* 確保按鈕區域與容器同高 */
             z-index: 10;
         }
 
-        /* --- 測試專用樣式：顯示按鈕文字與邊框 (保持不變) --- */
+        /* --- 測試專用樣式：顯示按鈕文字與邊框 --- */
         .option-button {
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
-            border: 2px solid black; /* 黑色邊框 */
+            background-color: rgba(255, 255, 255, 0.8); 
+            border: 2px solid black; 
             cursor: pointer;
             z-index: 20; 
             
-            color: black !important; /* 顯示黑色文字 */
+            color: black !important; 
             font-size: 16px !important;       
             line-height: normal !important;     
             text-indent: 0;          
@@ -54,31 +61,31 @@
         }
         /* --- 測試專用樣式結束 --- */
         
-        /* 頁面特定按鈕的定位 */
+        /* 頁面特定按鈕的定位 (根據使用者要求調整) */
         
-        /* 1. 封面頁按鈕: top: 20% */
+        /* 1. 封面頁按鈕: top: 25% (使用新數值) */
         .start-cover-button {
             width: 80%; 
             left: 10%;
-            top: 25%; 
+            top: 25%; /* 修正為 25% */
             height: 10%; 
         }
 
-        /* 2. 導言頁和確認結果頁按鈕: top: 90% */
+        /* 2. 導言頁和確認結果頁按鈕: top: 95% (使用新數值) */
         .start-bottom-button {
             width: 80%; 
             left: 10%;
-            top: 95%; 
+            top: 95%; /* 修正為 95% */
             height: 7%; 
         }
 
-        /* 題目頁（q1-q6）的四個選項按鈕 */
+        /* 題目頁（q1-q6）的四個選項按鈕 (不變) */
         .q-btn-a { top: 48%; left: 10%; width: 80%; height: 8%; }
         .q-btn-b { top: 58%; left: 10%; width: 80%; height: 8%; }
         .q-btn-c { top: 68%; left: 10%; width: 80%; height: 8%; }
         .q-btn-d { top: 78%; left: 10%; width: 80%; height: 8%; }
 
-        /* 結果頁的三個按鈕 */
+        /* 結果頁的三個按鈕 (不變) */
         .result-btn-share {
             top: 90%; 
             left: 10%; 
@@ -109,27 +116,18 @@
 </div>
 
 <script>
-    // --- 測驗資料定義 ---
+    // --- 測驗資料定義 (保持 PNG 格式) ---
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
         '劉又熊': 'https://forms.gle/4C3PAuXNZKUm4CN98',   
         '林易祺': 'https://forms.gle/5SHN6fTp3p6397vs8'    
     };
 
-    // 圖片格式已修正為 .png
     const PAGE_IMAGES = [
-        'cover.png',        
-        'intro.png',        
-        'q1.png',           
-        'q2.png',           
-        'q3.png',           
-        'q4.png',           
-        'q5.png',           
-        'q6.png',           
-        'gotoresult.png'    
+        'cover.png', 'intro.png', 'q1.png', 'q2.png', 'q3.png', 
+        'q4.png', 'q5.png', 'q6.png', 'gotoresult.png'    
     ];
     
-    // 圖片格式已修正為 .png
     const RESULT_DETAILS = {
         'R1': { file: 'result_star.png', lecture: '捏捏' },      
         'R2': { file: 'result_sun.png', lecture: '捏捏' },       
@@ -175,19 +173,22 @@
             setPageImage(PAGE_IMAGES[currentPage]);
             
             if (currentPage === 0) {
-                renderStartButton(() => navigate(1), '開始'); // 封面
+                // 封面頁: top: 25%
+                renderStartButton(() => navigate(1), '開始', 'start-cover-button'); 
             } else if (currentPage === 1) {
-                renderStartButton(() => navigate(2), '測驗開始', 'start-quiz-button'); // 導言
+                // 導言頁: top: 95%
+                renderStartButton(() => navigate(2), '測驗開始', 'start-bottom-button'); 
             } else if (currentPage >= 2 && currentPage <= 7) {
-                renderQuizButtons(currentPage - 2); // Q1 到 Q6
+                renderQuizButtons(currentPage - 2); 
             } else if (currentPage === 8) {
-                renderStartButton(calculateResult, '確認結果'); // 確認結果
+                // 確認結果頁: top: 95%
+                renderStartButton(calculateResult, '確認結果', 'start-bottom-button'); 
             }
         } 
     }
 
     // --- 函式：繪製單一的啟動/確認按鈕 (顯示文字，可指定樣式) ---
-    function renderStartButton(callback, text, buttonClass = 'start-button') {
+    function renderStartButton(callback, text, buttonClass) {
         const button = document.createElement('button');
         button.className = `option-button ${buttonClass}`; 
         button.textContent = text; 
@@ -201,7 +202,7 @@
         for (let i = 0; i < 4; i++) {
             const button = document.createElement('button');
             const answerValue = i + 1; 
-            const text = String.fromCharCode(65 + i); // 顯示 A, B, C, D
+            const text = String.fromCharCode(65 + i); 
             
             button.className = `option-button ${classes[i]}`;
             button.textContent = text; 
@@ -246,6 +247,8 @@
         const result = RESULT_DETAILS[finalResultKey];
         setPageImage(result.file);
 
+        // 結果頁的三個按鈕
+        
         // 1. 分享按鈕 (左)
         const shareBtn = document.createElement('button');
         shareBtn.className = 'option-button result-btn-share';
@@ -283,6 +286,3 @@
 
 </body>
 </html>
-
-
-
