@@ -53,21 +53,20 @@
         
         /* 頁面特定按鈕的定位 */
         
-        /* 封面 (cover.png) 和 確認結果頁 (gotoresult.png) 的底部按鈕 */
+        /* --- 修正點：封面 (cover.png) 和 確認結果頁 (gotoresult.png) 的底部按鈕 --- */
         .start-button {
             width: 80%; 
             left: 10%;
-            top: 75%; 
-            height: 7%;
+            top: 73%;   /* 調整位置 */
+            height: 10%; /* 增加高度，更容易點擊 */
         }
 
-        /* --- 修正點 --- */
         /* 導言頁 (intro.png) 的「測驗開始」按鈕位置 */
         .start-quiz-button {
-            width: 70%; /* 根據圖片中按鈕的視覺寬度調整 */
-            left: 15%;  /* 根據圖片中按鈕的視覺位置調整 */
-            top: 36%;   /* 根據圖片中按鈕的視覺位置調整 */
-            height: 7%; /* 根據圖片中按鈕的視覺高度調整 */
+            width: 70%; 
+            left: 15%;  
+            top: 36%;   
+            height: 8%; 
         }
         /* --- 修正點結束 --- */
 
@@ -165,7 +164,7 @@
         buttonArea.innerHTML = ''; 
     }
 
-    // --- 函式：處理頁面切換 (修正 intro.png 按鈕) ---
+    // --- 函式：處理頁面切換 ---
     function navigate(nextPage) {
         currentPage = nextPage;
         if (currentPage < PAGE_IMAGES.length) {
@@ -174,7 +173,6 @@
             if (currentPage === 0) {
                 renderStartButton(() => navigate(1)); // 封面 -> 導言 (底部按鈕)
             } else if (currentPage === 1) {
-                // 修正此處：intro.png 使用新的按鈕樣式 'start-quiz-button'
                 renderStartButton(() => navigate(2), 'start-quiz-button'); // 導言 -> Q1 (中間按鈕)
             } else if (currentPage >= 2 && currentPage <= 7) {
                 renderQuizButtons(currentPage - 2); 
@@ -187,7 +185,7 @@
     // --- 函式：繪製單一的啟動/確認按鈕 (無文字，可指定樣式) ---
     function renderStartButton(callback, buttonClass = 'start-button') {
         const button = document.createElement('button');
-        button.className = `option-button ${buttonClass}`; // 使用傳入的類別
+        button.className = `option-button ${buttonClass}`; 
         button.innerHTML = ''; 
         button.onclick = callback;
         buttonArea.appendChild(button);
