@@ -10,13 +10,12 @@ body {
     min-height: 100vh;
     overflow-y: auto; 
     color: #fff;
-    /* 避免圖片拖曳時出現藍色框線 */
     user-select: none;
     -webkit-user-select: none;
 }
 
 .container {
-    max-width: 600px; /* 最大寬度，適合手機與平板 */
+    max-width: 600px; 
     width: 100%;
     text-align: center;
     padding: 0; 
@@ -26,7 +25,7 @@ body {
 .quiz-image-container {
     position: relative;
     width: 100%;
-    /* 圖片寬高比：165% (根據您的圖片實際比例設定) */
+    /* 圖片寬高比：165% */
     padding-bottom: 165%; 
     height: 0;
     overflow: hidden;
@@ -40,8 +39,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* 確保圖片不被裁切 */
-    pointer-events: none; /* 讓圖片不接收點擊，點擊事件完全交給 Hotspot */
+    object-fit: contain; 
+    pointer-events: none; /* 讓圖片不接收點擊，點擊事件交給 Hotspot */
 }
 
 /* --- Hotspot 點擊區域容器 --- */
@@ -61,16 +60,13 @@ body {
     border: none; /* 移除邊框，解決方塊顯示問題 */
     cursor: pointer;
     transition: background-color 0.1s;
-    /* 避免點擊時出現藍色虛線框 */
-    outline: none; 
+    outline: none; /* 避免點擊時出現藍色虛線框 */
 }
 
-/* 懸停視覺回饋 (主要用於電腦端) */
 .hotspot:hover {
     background: rgba(255, 222, 112, 0.1); 
 }
 
-/* 非活動 Hotspot 隱藏 */
 .hotspot:not(.active) {
     display: none;
 }
