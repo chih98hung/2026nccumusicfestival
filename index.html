@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜</title>
+    <title>風塵卜卜 - 命運測驗 (PNG 測試版)</title>
     <style>
         /* CSS 樣式：設定全屏背景圖和按鈕位置 */
         body {
@@ -36,29 +36,32 @@
             z-index: 10;
         }
 
-        /* 通用按鈕樣式 - 完全隱形 */
+        /* --- 測試專用樣式：顯示按鈕文字與邊框 (保持不變) --- */
         .option-button {
             position: absolute;
-            background-color: transparent; 
-            border: none;
+            background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+            border: 2px solid black; /* 黑色邊框 */
             cursor: pointer;
             z-index: 20; 
             
-            color: transparent !important; 
-            font-size: 0 !important;       
-            line-height: 0 !important;     
-            text-indent: -9999px;          
-            overflow: hidden; 
+            color: black !important; /* 顯示黑色文字 */
+            font-size: 16px !important;       
+            line-height: normal !important;     
+            text-indent: 0;          
+            overflow: visible; 
+            text-align: center;
+            font-weight: bold;
         }
+        /* --- 測試專用樣式結束 --- */
         
         /* 頁面特定按鈕的定位 */
         
-        /* --- 修正點：封面 (cover.png) 和 確認結果頁 (gotoresult.png) 的底部按鈕 --- */
+        /* 封面 (cover.png) 和 確認結果頁 (gotoresult.png) 的底部按鈕 */
         .start-button {
             width: 80%; 
             left: 10%;
-            top: 73%;   /* 調整位置 */
-            height: 10%; /* 增加高度，更容易點擊 */
+            top: 73%;   
+            height: 10%; 
         }
 
         /* 導言頁 (intro.png) 的「測驗開始」按鈕位置 */
@@ -68,7 +71,6 @@
             top: 36%;   
             height: 8%; 
         }
-        /* --- 修正點結束 --- */
 
         /* 題目頁（q1-q6）的四個選項按鈕 */
         .q-btn-a { top: 48.5%; left: 10%; width: 80%; height: 8%; }
@@ -114,6 +116,7 @@
         '林易祺': 'https://forms.gle/5SHN6fTp3p6397vs8'    
     };
 
+    // 圖片格式已修正為 .png
     const PAGE_IMAGES = [
         'cover.png',        
         'intro.png',        
@@ -126,6 +129,7 @@
         'gotoresult.png'    
     ];
     
+    // 圖片格式已修正為 .png
     const RESULT_DETAILS = {
         'R1': { file: 'result_star.png', lecture: '捏捏' },      
         'R2': { file: 'result_sun.png', lecture: '捏捏' },       
@@ -171,35 +175,36 @@
             setPageImage(PAGE_IMAGES[currentPage]);
             
             if (currentPage === 0) {
-                renderStartButton(() => navigate(1)); // 封面 -> 導言 (底部按鈕)
+                renderStartButton(() => navigate(1), '開始'); // 封面
             } else if (currentPage === 1) {
-                renderStartButton(() => navigate(2), 'start-quiz-button'); // 導言 -> Q1 (中間按鈕)
+                renderStartButton(() => navigate(2), '測驗開始', 'start-quiz-button'); // 導言
             } else if (currentPage >= 2 && currentPage <= 7) {
-                renderQuizButtons(currentPage - 2); 
+                renderQuizButtons(currentPage - 2); // Q1 到 Q6
             } else if (currentPage === 8) {
-                renderStartButton(calculateResult); // 確認結果 -> 結果頁 (底部按鈕)
+                renderStartButton(calculateResult, '確認結果'); // 確認結果
             }
         } 
     }
 
-    // --- 函式：繪製單一的啟動/確認按鈕 (無文字，可指定樣式) ---
-    function renderStartButton(callback, buttonClass = 'start-button') {
+    // --- 函式：繪製單一的啟動/確認按鈕 (顯示文字，可指定樣式) ---
+    function renderStartButton(callback, text, buttonClass = 'start-button') {
         const button = document.createElement('button');
         button.className = `option-button ${buttonClass}`; 
-        button.innerHTML = ''; 
+        button.textContent = text; 
         button.onclick = callback;
         buttonArea.appendChild(button);
     }
 
-    // --- 函式：繪製題目選項按鈕 (無文字) ---
+    // --- 函式：繪製題目選項按鈕 (顯示文字) ---
     function renderQuizButtons(questionIndex) {
         const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
         for (let i = 0; i < 4; i++) {
             const button = document.createElement('button');
             const answerValue = i + 1; 
+            const text = String.fromCharCode(65 + i); // 顯示 A, B, C, D
             
             button.className = `option-button ${classes[i]}`;
-            button.innerHTML = ''; 
+            button.textContent = text; 
             button.onclick = () => {
                 userAnswers[questionIndex] = answerValue;
                 if (questionIndex < 5) {
@@ -235,7 +240,7 @@
         renderResultPage();
     }
 
-    // --- 函式：繪製結果頁 (無文字) ---
+    // --- 函式：繪製結果頁 (顯示文字) ---
     function renderResultPage() {
         currentPage = 9; 
         const result = RESULT_DETAILS[finalResultKey];
@@ -244,24 +249,16 @@
         // 1. 分享按鈕 (左)
         const shareBtn = document.createElement('button');
         shareBtn.className = 'option-button result-btn-share';
-        shareBtn.innerHTML = ''; 
+        shareBtn.textContent = '分享'; 
         shareBtn.onclick = () => {
-            if (navigator.share) {
-                navigator.share({
-                    title: '風塵卜卜：我的命運結果',
-                    text: '快來測測你的命運之聲！',
-                    url: window.location.href, 
-                }).catch(() => alert('分享功能失效，請長按圖片手動截圖並分享！'));
-            } else {
-                alert('請長按圖片手動截圖並分享到社群！'); 
-            }
+            alert('分享功能，請調整按鈕位置！');
         };
         buttonArea.appendChild(shareBtn);
 
         // 2. 再玩一次按鈕 (中)
         const replayBtn = document.createElement('button');
         replayBtn.className = 'option-button result-btn-replay';
-        replayBtn.innerHTML = ''; 
+        replayBtn.textContent = '再玩一次'; 
         replayBtn.onclick = () => {
             userAnswers = []; 
             navigate(0); 
@@ -271,7 +268,7 @@
         // 3. 報名講座按鈕 (右)
         const signupBtn = document.createElement('button');
         signupBtn.className = 'option-button result-btn-signup';
-        signupBtn.innerHTML = ''; 
+        signupBtn.textContent = '報名講座'; 
         signupBtn.onclick = () => {
             const lectureUrl = LECTURE_URLS[result.lecture];
             window.open(lectureUrl, '_blank'); 
