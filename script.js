@@ -152,10 +152,106 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /** 前往外部講座連結 */
-    function goToExternalLink() {
-        window.open(EXTERNAL_LINK, '_blank');
+// --- 外部連結設定 ---
+// 🚨 請將這裡的佔位符替換為您實際的三個外部網址！
+const LINK_GROUP_A = "https://your-external-link-A.com/lesson"; 
+const LINK_GROUP_B = "https://your-external-link-B.com/lesson";
+const LINK_GROUP_C = "https://your-external-link-C.com/lesson";
+
+// --- 測驗結果定義 (與您的圖片名稱完全對應，並新增 link 屬性) ---
+const results = [
+    // 0~4 分 -> 霧 (foggy)
+    { scoreRange: [0, 4], title: "靜霧", resultImage: "result_foggy.jpg", link: LINK_GROUP_A },
+    
+    // 5~9 分 -> 晨 (dawn)
+    { scoreRange: [5, 9], title: "晨曦", resultImage: "result_dawn.jpg", link: LINK_GROUP_A }, 
+    
+    // 10~14 分 -> 星 (star)
+    { scoreRange: [10, 14], title: "辰星", resultImage: "result_star.jpg", link: LINK_GROUP_B },
+    
+    // 15~19 分 -> 月 (moon)
+    { scoreRange: [15, 19], title: "幻月", resultImage: "result_moon.jpg", link: LINK_GROUP_B },
+    
+    // 20~24 分 -> 陽 (sun)
+    { scoreRange: [20, 24], title: "朝陽", resultImage: "result_sun.jpg", link: LINK_GROUP_C },
+    
+    // 25~30 分 -> 暉 (sunset)
+    { scoreRange: [25, 30], title: "餘暉", resultImage: "result_sunset.jpg", link: LINK_GROUP_C }
+];
+
+// --- 狀態追蹤變數 ---
+let currentQuestionIndex = 0;
+let totalScore = 0;
+let finalResult = null; 
+let currentExternalLink = ""; // ✨ 新增：儲存當前結果對應的外部連結
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // (元素選取保持不變)
+    const mainImageEl = document.getElementById('main-image');
+    const progressEl = document.getElementById('progress');
+    const hotspotA = document.getElementById('hotspot-a');
+    const hotspotB = document.getElementById('hotspot-b');
+    const hotspotC = document.getElementById('hotspot-c');
+    const hotspotButtons = document.querySelectorAll('.hotspot');
+
+
+    // (setHotspots, showIntroduction, startQuiz, loadQuestion, handleAnswer 函數保持不變)
+    
+    // ... (保留 setHotspots 函數) ...
+    // ... (保留 showIntroduction 函數) ...
+    // ... (保留 startQuiz 函數) ...
+    // ... (保留 loadQuestion 函數) ...
+    // ... (保留 handleAnswer 函數) ...
+
+    /** 題目答完，進入「確認結果」中繼頁 (✨ 新增連結儲存) */
+    function showGoToResult() {
+        // 找出最終結果
+        finalResult = results.find(r => 
+            totalScore >= r.scoreRange[0] && totalScore <= r.scoreRange[1]
+        );
+
+        // ✨ 儲存當前結果對應的外部連結
+        currentExternalLink = finalResult.link;
+        
+        mainImageEl.src = "gotoresult.jpg";
+        progressEl.classList.add('hidden');
+        setHotspots('single', showResult);
     }
+
+    /** 顯示最終結果頁 (保持不變) */
+    function showResult() {
+        mainImageEl.src = finalResult.resultImage || 'default_result.jpg'; 
+        setHotspots('result'); 
+    }
+
+    /** 分享功能 (保持不變) */
+    function shareResult() {
+        if (navigator.share) {
+            navigator.share({
+                title: finalResult.title + ' - 日曆心理測驗',
+                text: '我在日曆心理測驗中測出了「' + finalResult.title + '」！快來看看你的內在色彩是什麼吧。',
+                url: window.location.href,
+            }).catch((error) => console.log('分享失敗', error));
+        } else {
+            alert('請長按或右鍵儲存圖片後，手動分享至社群媒體。');
+        }
+    }
+
+    /** 前往外部講座連結 (✨ 使用儲存的變數) */
+    function goToExternalLink() {
+        if (currentExternalLink) {
+            window.open(currentExternalLink, '_blank');
+        } else {
+            // 安全機制，如果連結沒有被設定，可以彈出提示
+            alert('連結尚未設定。');
+        }
+    }
+
+    // --- 程式初始化 (網站載入) ---
+    setHotspots('single', showIntroduction); 
+});
 
     // --- 程式初始化 (網站載入) ---
     setHotspots('single', showIntroduction); 
