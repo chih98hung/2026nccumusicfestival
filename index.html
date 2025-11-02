@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗</title>
+    <title>風塵卜卜 - 命運測驗 (長按儲存修正)</title>
     <style>
+        /* (CSS 保持不變，專注於 pointer-events 修正) */
         html, body {
             height: 100%; 
             margin: 0;
@@ -17,27 +18,24 @@
             display: flex;
             justify-content: center;
             align-items: center; 
-            min-height: 100vh; /* 確保至少佔滿視窗高度 */
+            min-height: 100vh;
             overflow: hidden; 
         }
 
         .quiz-container {
             width: 100%;
-            max-width: 480px; /* 限制最大寬度，模擬手機 */
-            /* 移除 height: 100vh; 讓它根據圖片內容自動調整，但不要超過視窗高度 */
-            max-height: 100vh; /* 確保不超過視窗高度 */
+            max-width: 480px;
+            max-height: 100vh;
             position: relative;
-            display: flex; /* 使用 flex 讓圖片在容器內置中 */
+            display: flex;
             align-items: center;
             justify-content: center;
-            /* **新增：讓 quiz-container 的高度和圖片的高度一致** */
-            height: auto; /* 讓容器高度適應圖片 */
+            height: auto; 
         }
 
         #quiz-image {
             width: 100%;
             display: block;
-            /* 圖片高度會自動調整，但不會超出視窗高度 */
             max-height: 100vh; 
             height: auto;
         }
@@ -48,12 +46,13 @@
             top: 0;
             left: 0;
             width: 100%;
-            /* **關鍵修正：讓 button-area 的高度與圖片同高** */
-            height: 100%; /* 相對於 quiz-container 的高度，而 quiz-container 現在適應圖片高度 */
+            height: 100%;
             z-index: 10;
+            /* **修正點 1：讓非按鈕區域不接收點擊事件，允許長按圖片** */
+            pointer-events: none; 
         }
 
-        /* --- 最終版：通用隱藏按鈕樣式 (不變) --- */
+        /* --- 最終版：通用隱藏按鈕樣式 --- */
         .option-button {
             position: absolute;
             background-color: transparent; 
@@ -66,11 +65,11 @@
             line-height: 0 !important;     
             text-indent: -9999px;          
             overflow: hidden; 
+            /* **修正點 2：重新啟用按鈕本身的點擊事件** */
+            pointer-events: auto; 
         }
         
-        /* 頁面特定按鈕的定位 (微調導言/確認結果頁的 top 值) */
-        
-        /* 1. 封面頁按鈕: top: 25% (不變) */
+        /* 頁面特定按鈕的定位 (維持您提供的版本) */
         .start-cover-button {
             width: 60%; 
             left: 20%;  
@@ -78,21 +77,18 @@
             height: 9%; 
         }
 
-        /* 2. 導言頁 ('準備好了') 和 確認結果頁 ('確認結果') 按鈕: top: 95% 區域 */
         .start-bottom-button {
             width: 50%; 
             left: 25%;  
-            top: 80%; 
+            top: 80%; /* 您的最新設定 */
             height: 10%; 
         }
 
-        /* 題目頁（q1-q6）的四個選項按鈕 (不變) */
         .q-btn-a { top: 48%; left: 10%; width: 80%; height: 7%; }
         .q-btn-b { top: 58%; left: 10%; width: 80%; height: 7%; }
         .q-btn-c { top: 68%; left: 10%; width: 80%; height: 7%; }
         .q-btn-d { top: 78%; left: 10%; width: 80%; height: 7%; }
 
-        /* 結果頁的三個底部按鈕 (不變) */
         .result-btn-share {
             top: 90%; 
             left: 8%; 
@@ -123,7 +119,8 @@
 </div>
 
 <script>
-    // --- 測驗資料定義 (不變) ---
+    // --- JavaScript 部分完全不變，因為分享功能已達到瀏覽器極限 ---
+
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
         '劉又熊': 'https://forms.gle/4C3PAuXNZKUm4CN98',   
@@ -144,7 +141,6 @@
         'R6': { file: 'result_moon.png', lecture: '林易祺' }      
     };
 
-    // --- 全局變數 ---
     let currentPage = 0; 
     let userAnswers = []; 
     let finalResultKey = '';
@@ -152,7 +148,6 @@
     const quizImage = document.getElementById('quiz-image');
     const buttonArea = document.getElementById('button-area');
 
-    // --- 程式碼優化：預先載入圖片 ---
     function preloadImages() {
         const imagesToPreload = [
             'intro.png', 'gotoresult.png', 
@@ -167,13 +162,11 @@
     }
     preloadImages(); 
 
-    // --- 函式：清除並設定圖片 ---
     function setPageImage(imageFileName) {
         quizImage.src = imageFileName;
         buttonArea.innerHTML = ''; 
     }
 
-    // --- 函式：處理頁面切換 ---
     function navigate(nextPage) {
         currentPage = nextPage;
         if (currentPage < PAGE_IMAGES.length) {
@@ -191,7 +184,6 @@
         } 
     }
 
-    // --- 函式：繪製單一的啟動/確認按鈕 (隱藏文字) ---
     function renderStartButton(callback, buttonClass) {
         const button = document.createElement('button');
         button.className = `option-button ${buttonClass}`; 
@@ -199,7 +191,6 @@
         buttonArea.appendChild(button);
     }
 
-    // --- 函式：繪製題目選項按鈕 (隱藏文字) ---
     function renderQuizButtons(questionIndex) {
         const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
         for (let i = 0; i < 4; i++) {
@@ -219,7 +210,6 @@
         }
     }
 
-    // --- 函式：結果計算邏輯 ---
     function calculateResult() {
         const score = userAnswers.reduce((sum, current) => sum + current, 0);
 
@@ -242,7 +232,6 @@
         renderResultPage();
     }
 
-    // --- 函式：繪製結果頁 (隱藏文字) ---
     function renderResultPage() {
         currentPage = 9; 
         const result = RESULT_DETAILS[finalResultKey];
@@ -257,7 +246,7 @@
                     title: '風塵卜卜：我的命運結果',
                     text: '快來測測你的命運之聲！',
                     url: window.location.href, 
-                }).catch(() => alert('分享失敗'));
+                }).catch(() => alert('分享失敗或已取消'));
             } else {
                 alert('分享功能失效，請長按圖片手動截圖並分享！'); 
             }
@@ -290,5 +279,3 @@
 
 </body>
 </html>
-
-
