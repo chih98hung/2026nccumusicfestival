@@ -8,6 +8,8 @@
         /* --- 關鍵修正：確保百分比定位有效 --- */
         html, body {
             height: 100%; /* 確保 HTML 和 BODY 佔據整個視窗高度 */
+            margin: 0; 
+            padding: 0; 
         }
 
         body {
@@ -17,20 +19,26 @@
             font-family: sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             /* 保持 flex 佈局，但確保高度正確 */
+            overflow: hidden; /* 新增 */
         }
         .quiz-container {
             width: 100%;
             max-width: 480px; 
             min-height: 100%; /* 確保它能繼承 body 的高度 */
             position: relative;
+            display: flex; /* 新增 */
+            align-items: center; /* 新增 */
+            justify-content: center; /* 新增 */
         }
         /* --- 關鍵修正結束 --- */
 
         #quiz-image {
             width: 100%;
             display: block;
+            max-height: 100vh; /* 新增 */
+            height: auto; /* 新增 */
         }
 
         /* 按鈕容器：位於圖片上方的絕對定位層 */
@@ -286,6 +294,7 @@
 
 </body>
 </html>
+
 
 
 
