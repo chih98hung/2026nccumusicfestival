@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗 (長按儲存最終修正)</title>
+    <title>風塵卜卜 - 命運測驗 (最終全面優化)</title>
     <style>
-        /* CSS 部分保持您修正長按的 pointer-events 設定，並將結果按鈕 z-index 提高 */
         html, body {
             height: 100%; 
             margin: 0;
@@ -20,6 +19,7 @@
             align-items: center; 
             min-height: 100vh;
             overflow: hidden; 
+            position: relative; /* 為載入提示做準備 */
         }
 
         .quiz-container {
@@ -31,6 +31,16 @@
             align-items: center;
             justify-content: center;
             height: auto; 
+            /* 預設隱藏，等待圖片載入完成才顯示 */
+            visibility: hidden; 
+            opacity: 0;
+            transition: visibility 0s 0.5s, opacity 0.5s linear; /* 平滑過渡 */
+        }
+
+        .quiz-container.loaded {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 0s;
         }
 
         #quiz-image {
@@ -38,30 +48,26 @@
             display: block;
             max-height: 100vh; 
             height: auto;
-            /* 讓圖片成為最下層，確保可以長按 */
             z-index: 1; 
         }
 
-        /* 按鈕容器：位於圖片上方的絕對定位層 */
+        /* 按鈕容器：用於導言頁和題目頁的熱區 */
         #button-area {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* 讓按鈕熱區層略高於圖片 */
             z-index: 5; 
-            /* 讓非按鈕區域不接收點擊事件 */
-            pointer-events: none; 
+            pointer-events: none; /* 讓非按鈕區域不接收點擊事件 */
         }
 
-        /* --- 最終版：通用隱藏按鈕樣式 --- */
+        /* --- 通用隱藏按鈕樣式 --- */
         .option-button {
             position: absolute;
             background-color: transparent; 
             border: none;                  
             cursor: pointer;
-            /* 確保按鈕熱區高於 button-area 和圖片 */
             z-index: 10; 
             
             color: transparent !important; 
@@ -69,11 +75,12 @@
             line-height: 0 !important;     
             text-indent: -9999px;          
             overflow: hidden; 
-            /* 重新啟用按鈕本身的點擊事件 */
-            pointer-events: auto; 
+            pointer-events: auto; /* 重新啟用按鈕本身的點擊事件 */
         }
         
-        /* 頁面特定按鈕的定位 (維持您提供的版本) */
+        /* 頁面特定按鈕的定位 */
+        
+        /* 1. 封面頁按鈕 */
         .start-cover-button {
             width: 60%; 
             left: 20%;  
@@ -81,20 +88,21 @@
             height: 9%; 
         }
 
+        /* 2. 導言頁 ('準備好了') 和 確認結果頁 ('確認結果') 按鈕: 再次微調位置 */
         .start-bottom-button {
             width: 50%; 
             left: 25%;  
-            top: 80%; 
-            height: 10%; 
+            top: 88%;   /* **關鍵修正：精確微調** */
+            height: 7%; /* **關鍵修正：精確微調** */
         }
 
+        /* 題目頁（q1-q6）的四個選項按鈕 */
         .q-btn-a { top: 48%; left: 10%; width: 80%; height: 7%; }
         .q-btn-b { top: 58%; left: 10%; width: 80%; height: 7%; }
         .q-btn-c { top: 68%; left: 10%; width: 80%; height: 7%; }
         .q-btn-d { top: 78%; left: 10%; width: 80%; height: 7%; }
 
-        /* 結果頁的三個底部按鈕 (維持在 quiz-container 內的絕對定位) */
-        /* 注意：它們現在會直接附加到 quiz-container */
+        /* 結果頁的三個底部按鈕 */
         .result-btn-share {
             top: 90%; 
             left: 8%; 
@@ -113,9 +121,50 @@
             width: 28%;
             height: 7%;
         }
+
+        /* --- 載入提示樣式 --- */
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d1226; /* 與 body 背景色一致 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 1.2em;
+            z-index: 9999; /* 確保在最上層 */
+            transition: opacity 0.5s linear;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none; /* 隱藏後不再接收點擊 */
+        }
+
+        /* 簡單的載入動畫 (可以替換成更複雜的) */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-left: 10px;">載入中...</p>
+</div>
 
 <div class="quiz-container">
     <img id="quiz-image" src="cover.png" alt="測驗封面">
@@ -125,8 +174,6 @@
 </div>
 
 <script>
-    // --- JavaScript 部分：修正 renderResultPage 函數邏輯 ---
-
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
         '劉又熊': 'https://forms.gle/4C3PAuXNZKUm4CN98',   
@@ -153,28 +200,33 @@
 
     const quizImage = document.getElementById('quiz-image');
     const buttonArea = document.getElementById('button-area');
-    const quizContainer = document.querySelector('.quiz-container'); // 獲取主容器
+    const quizContainer = document.querySelector('.quiz-container');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
-    function preloadImages() {
+    // --- 程式碼優化：預先載入所有圖片，並等待完成 ---
+    function preloadAllImages() {
         const imagesToPreload = [
-            'intro.png', 'gotoresult.png', 
-            'q1.png', 'q2.png', 'q3.png', 'q4.png', 'q5.png', 'q6.png', 
-            'result_star.png', 'result_sun.png', 'result_foggy.png', 
-            'result_sunset.png', 'result_dawn.png', 'result_moon.png' 
+            ...PAGE_IMAGES, // 所有頁面圖片
+            ...Object.values(RESULT_DETAILS).map(r => r.file) // 所有結果圖片
         ];
-        imagesToPreload.forEach(src => {
-            const img = new Image();
-            img.src = src;
+        
+        const imagePromises = imagesToPreload.map(src => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = resolve;
+                img.onerror = reject;
+            });
         });
+
+        return Promise.all(imagePromises);
     }
-    preloadImages(); 
 
     function setPageImage(imageFileName) {
         quizImage.src = imageFileName;
-        // 在非結果頁時，我們清空 buttonArea (包含結果按鈕)，並在 navigate 中重新繪製
         buttonArea.innerHTML = ''; 
 
-        // **修正點：清理上一次結果頁可能直接添加到 quizContainer 的按鈕**
+        // 清理上一次結果頁可能直接添加到 quizContainer 的按鈕
         document.querySelectorAll('.quiz-container > .option-button').forEach(btn => {
             btn.remove();
         });
@@ -185,7 +237,6 @@
         if (currentPage < PAGE_IMAGES.length) {
             setPageImage(PAGE_IMAGES[currentPage]);
             
-            // 由於 result page 的按鈕是直接在 quizContainer 上，非 result page 的按鈕才需要在 buttonArea 上
             if (currentPage === 0) {
                 renderStartButton(() => navigate(1), 'start-cover-button', buttonArea); 
             } else if (currentPage === 1) {
@@ -198,7 +249,6 @@
         } 
     }
 
-    // 重新定義 renderStartButton 以便可以指定父元素
     function renderStartButton(callback, buttonClass, parentElement) {
         const button = document.createElement('button');
         button.className = `option-button ${buttonClass}`; 
@@ -206,7 +256,6 @@
         parentElement.appendChild(button);
     }
 
-    // 重新定義 renderQuizButtons 以便可以指定父元素
     function renderQuizButtons(questionIndex, parentElement) {
         const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
         for (let i = 0; i < 4; i++) {
@@ -248,44 +297,65 @@
         renderResultPage();
     }
 
-    // --- 關鍵修正處 ---
     function renderResultPage() {
         currentPage = 9; 
         const result = RESULT_DETAILS[finalResultKey];
-        setPageImage(result.file); // 設置結果圖片，同時會清空 buttonArea 內容
+        setPageImage(result.file);
 
-        // **重要：將按鈕直接添加到 quizContainer，繞過 buttonArea 阻擋**
         // 1. 分享按鈕 (左)
         renderStartButton(() => {
+            // **分享功能**
             if (navigator.share) {
                 navigator.share({
                     title: '風塵卜卜：我的命運結果',
                     text: '快來測測你的命運之聲！',
                     url: window.location.href, 
-                }).catch(() => alert('分享失敗或已取消'));
+                }).catch(() => {
+                    // 如果用戶取消分享，會進入這裡
+                    console.log('分享已取消或失敗');
+                    // 為了防止直接提示「下載失敗」給用戶，僅記錄到控制台
+                });
             } else {
-                alert('分享功能失效，請長按圖片手動截圖並分享！'); 
+                alert('分享功能失效，將嘗試下載圖片。'); 
             }
-        }, 'result-btn-share', quizContainer); // 直接加到 quizContainer
+
+            // **強制下載圖片 (如果分享失敗或不可用)**
+            // 由於 setPageImage 已經更新了 quizImage.src，這裡直接使用當前圖片
+            const imageUrl = quizImage.src;
+            if (imageUrl) {
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = `風塵卜卜_我的命運結果_${finalResultKey}.png`; // 建議的下載文件名
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }, 'result-btn-share', quizContainer);
 
         // 2. 再玩一次按鈕 (中)
         renderStartButton(() => {
             userAnswers = []; 
             navigate(0); 
-        }, 'result-btn-replay', quizContainer); // 直接加到 quizContainer
+        }, 'result-btn-replay', quizContainer);
 
         // 3. 報名講座按鈕 (右)
         renderStartButton(() => {
             const lectureUrl = LECTURE_URLS[result.lecture];
             window.open(lectureUrl, '_blank'); 
-        }, 'result-btn-signup', quizContainer); // 直接加到 quizContainer
-        
-        // **由於 buttonArea 已經被清空，且結果按鈕是直接加到 quizContainer，
-        // 現在圖片上方應該沒有任何阻擋長按的透明層了。**
+        }, 'result-btn-signup', quizContainer);
     }
 
     // --- 程式碼啟動點 ---
-    navigate(0);
+    // 先載入所有圖片，完成後才顯示測驗頁面
+    preloadAllImages().then(() => {
+        console.log('所有圖片載入完成！');
+        loadingOverlay.classList.add('hidden'); // 隱藏載入提示
+        quizContainer.classList.add('loaded'); // 顯示測驗容器
+        navigate(0); // 載入完成後才開始測驗
+    }).catch(error => {
+        console.error('圖片載入失敗:', error);
+        loadingOverlay.innerHTML = '<p style="color:red;">圖片載入失敗，請檢查網路！</p>';
+    });
 
 </script>
 
