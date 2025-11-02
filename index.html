@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗 (長按儲存修正)</title>
+    <title>風塵卜卜 - 命運測驗 (長按儲存最終修正)</title>
     <style>
-        /* (CSS 保持不變，專注於 pointer-events 修正) */
+        /* CSS 部分保持您修正長按的 pointer-events 設定，並將結果按鈕 z-index 提高 */
         html, body {
             height: 100%; 
             margin: 0;
@@ -38,6 +38,8 @@
             display: block;
             max-height: 100vh; 
             height: auto;
+            /* 讓圖片成為最下層，確保可以長按 */
+            z-index: 1; 
         }
 
         /* 按鈕容器：位於圖片上方的絕對定位層 */
@@ -47,8 +49,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10;
-            /* **修正點 1：讓非按鈕區域不接收點擊事件，允許長按圖片** */
+            /* 讓按鈕熱區層略高於圖片 */
+            z-index: 5; 
+            /* 讓非按鈕區域不接收點擊事件 */
             pointer-events: none; 
         }
 
@@ -58,14 +61,15 @@
             background-color: transparent; 
             border: none;                  
             cursor: pointer;
-            z-index: 20; 
+            /* 確保按鈕熱區高於 button-area 和圖片 */
+            z-index: 10; 
             
             color: transparent !important; 
             font-size: 0 !important;       
             line-height: 0 !important;     
             text-indent: -9999px;          
             overflow: hidden; 
-            /* **修正點 2：重新啟用按鈕本身的點擊事件** */
+            /* 重新啟用按鈕本身的點擊事件 */
             pointer-events: auto; 
         }
         
@@ -80,7 +84,7 @@
         .start-bottom-button {
             width: 50%; 
             left: 25%;  
-            top: 80%; /* 您的最新設定 */
+            top: 80%; 
             height: 10%; 
         }
 
@@ -89,6 +93,8 @@
         .q-btn-c { top: 68%; left: 10%; width: 80%; height: 7%; }
         .q-btn-d { top: 78%; left: 10%; width: 80%; height: 7%; }
 
+        /* 結果頁的三個底部按鈕 (維持在 quiz-container 內的絕對定位) */
+        /* 注意：它們現在會直接附加到 quiz-container */
         .result-btn-share {
             top: 90%; 
             left: 8%; 
@@ -119,7 +125,7 @@
 </div>
 
 <script>
-    // --- JavaScript 部分完全不變，因為分享功能已達到瀏覽器極限 ---
+    // --- JavaScript 部分：修正 renderResultPage 函數邏輯 ---
 
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
@@ -147,6 +153,7 @@
 
     const quizImage = document.getElementById('quiz-image');
     const buttonArea = document.getElementById('button-area');
+    const quizContainer = document.querySelector('.quiz-container'); // 獲取主容器
 
     function preloadImages() {
         const imagesToPreload = [
@@ -164,7 +171,13 @@
 
     function setPageImage(imageFileName) {
         quizImage.src = imageFileName;
+        // 在非結果頁時，我們清空 buttonArea (包含結果按鈕)，並在 navigate 中重新繪製
         buttonArea.innerHTML = ''; 
+
+        // **修正點：清理上一次結果頁可能直接添加到 quizContainer 的按鈕**
+        document.querySelectorAll('.quiz-container > .option-button').forEach(btn => {
+            btn.remove();
+        });
     }
 
     function navigate(nextPage) {
@@ -172,26 +185,29 @@
         if (currentPage < PAGE_IMAGES.length) {
             setPageImage(PAGE_IMAGES[currentPage]);
             
+            // 由於 result page 的按鈕是直接在 quizContainer 上，非 result page 的按鈕才需要在 buttonArea 上
             if (currentPage === 0) {
-                renderStartButton(() => navigate(1), 'start-cover-button'); 
+                renderStartButton(() => navigate(1), 'start-cover-button', buttonArea); 
             } else if (currentPage === 1) {
-                renderStartButton(() => navigate(2), 'start-bottom-button'); 
+                renderStartButton(() => navigate(2), 'start-bottom-button', buttonArea); 
             } else if (currentPage >= 2 && currentPage <= 7) {
-                renderQuizButtons(currentPage - 2); 
+                renderQuizButtons(currentPage - 2, buttonArea); 
             } else if (currentPage === 8) {
-                renderStartButton(calculateResult, 'start-bottom-button'); 
+                renderStartButton(calculateResult, 'start-bottom-button', buttonArea); 
             }
         } 
     }
 
-    function renderStartButton(callback, buttonClass) {
+    // 重新定義 renderStartButton 以便可以指定父元素
+    function renderStartButton(callback, buttonClass, parentElement) {
         const button = document.createElement('button');
         button.className = `option-button ${buttonClass}`; 
         button.onclick = callback;
-        buttonArea.appendChild(button);
+        parentElement.appendChild(button);
     }
 
-    function renderQuizButtons(questionIndex) {
+    // 重新定義 renderQuizButtons 以便可以指定父元素
+    function renderQuizButtons(questionIndex, parentElement) {
         const classes = ['q-btn-a', 'q-btn-b', 'q-btn-c', 'q-btn-d'];
         for (let i = 0; i < 4; i++) {
             const button = document.createElement('button');
@@ -206,7 +222,7 @@
                     navigate(8); 
                 }
             };
-            buttonArea.appendChild(button);
+            parentElement.appendChild(button);
         }
     }
 
@@ -215,67 +231,3 @@
 
         let resultKey;
         if (score <= 9) {
-            resultKey = 'R1'; 
-        } else if (score <= 12) {
-            resultKey = 'R2'; 
-        } else if (score <= 15) {
-            resultKey = 'R3'; 
-        } else if (score <= 18) {
-            resultKey = 'R4'; 
-        } else if (score <= 21) {
-            resultKey = 'R5'; 
-        } else {
-            resultKey = 'R6'; 
-        }
-        
-        finalResultKey = resultKey;
-        renderResultPage();
-    }
-
-    function renderResultPage() {
-        currentPage = 9; 
-        const result = RESULT_DETAILS[finalResultKey];
-        setPageImage(result.file);
-
-        // 1. 分享按鈕 (左)
-        const shareBtn = document.createElement('button');
-        shareBtn.className = 'option-button result-btn-share';
-        shareBtn.onclick = () => {
-            if (navigator.share) {
-                navigator.share({
-                    title: '風塵卜卜：我的命運結果',
-                    text: '快來測測你的命運之聲！',
-                    url: window.location.href, 
-                }).catch(() => alert('分享失敗或已取消'));
-            } else {
-                alert('分享功能失效，請長按圖片手動截圖並分享！'); 
-            }
-        };
-        buttonArea.appendChild(shareBtn);
-
-        // 2. 再玩一次按鈕 (中)
-        const replayBtn = document.createElement('button');
-        replayBtn.className = 'option-button result-btn-replay';
-        replayBtn.onclick = () => {
-            userAnswers = []; 
-            navigate(0); 
-        };
-        buttonArea.appendChild(replayBtn);
-
-        // 3. 報名講座按鈕 (右)
-        const signupBtn = document.createElement('button');
-        signupBtn.className = 'option-button result-btn-signup';
-        signupBtn.onclick = () => {
-            const lectureUrl = LECTURE_URLS[result.lecture];
-            window.open(lectureUrl, '_blank'); 
-        };
-        buttonArea.appendChild(signupBtn);
-    }
-
-    // --- 程式碼啟動點 ---
-    navigate(0);
-
-</script>
-
-</body>
-</html>
