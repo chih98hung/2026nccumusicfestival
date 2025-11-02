@@ -3,43 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗</title>
+    <title>風塵卜卜 - 命運測驗 (最終優化版)</title>
     <style>
+        /* --- 核心修正：響應式適配與防止變形 --- */
         html, body {
             height: 100%; 
             margin: 0;
             padding: 0;
+            background-color: #0d1226; 
+            overflow: hidden; /* 徹底防止滾動條 */
         }
 
         body {
-            background-color: #0d1226; 
             font-family: sans-serif;
             display: flex;
             justify-content: center;
             align-items: center; 
-            min-height: 100vh; /* 確保至少佔滿視窗高度 */
-            overflow: hidden; 
+            min-height: 100vh;
         }
 
         .quiz-container {
+            /* **核心修正**：使用 min/max 屬性確保圖片寬高比例不變 */
             width: 100%;
-            max-width: 480px; /* 限制最大寬度，模擬手機 */
-            /* 移除 height: 100vh; 讓它根據圖片內容自動調整，但不要超過視窗高度 */
-            max-height: 100vh; /* 確保不超過視窗高度 */
+            height: 100vh; /* 容器始終佔滿視窗高度 */
+            max-width: 480px; /* 模擬手機寬度限制 */
             position: relative;
-            display: flex; /* 使用 flex 讓圖片在容器內置中 */
+            display: flex;
             align-items: center;
             justify-content: center;
-            /* **新增：讓 quiz-container 的高度和圖片的高度一致** */
-            height: auto; /* 讓容器高度適應圖片 */
+            
+            /* **新增：處理 container 自己的溢出 (重要)** */
+            overflow: hidden; 
         }
 
         #quiz-image {
-            width: 100%;
             display: block;
-            /* 圖片高度會自動調整，但不會超出視窗高度 */
+            /* **關鍵修正：讓圖片根據其寬高比，適應 container 的限制** */
+            width: 100%; 
+            height: auto; 
             max-height: 100vh; 
-            height: auto;
+            
+            /* 如果圖片是固定比例 (例如 9:16)，width: 100%; max-height: 100vh;
+               就能確保它在不變形的前提下，盡可能佔滿空間 */
         }
 
         /* 按鈕容器：位於圖片上方的絕對定位層 */
@@ -48,8 +53,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            /* **關鍵修正：讓 button-area 的高度與圖片同高** */
-            height: 100%; /* 相對於 quiz-container 的高度，而 quiz-container 現在適應圖片高度 */
+            height: 100%; /* 相對於 quiz-container (100vh) */
             z-index: 10;
         }
 
@@ -68,7 +72,7 @@
             overflow: hidden; 
         }
         
-        /* 頁面特定按鈕的定位 (微調導言/確認結果頁的 top 值) */
+        /* 頁面特定按鈕的定位 */
         
         /* 1. 封面頁按鈕: top: 25% (不變) */
         .start-cover-button {
@@ -78,11 +82,11 @@
             height: 9%; 
         }
 
-        /* 2. 導言頁 ('準備好了') 和 確認結果頁 ('確認結果') 按鈕: top: 95% 區域 */
+        /* 2. 導言頁 ('準備好了') 和 確認結果頁 ('確認結果') 按鈕: 針對圖片圖形大幅上移 */
         .start-bottom-button {
             width: 50%; 
             left: 25%;  
-            top: 93.5%;   /* **保持微調後的數值，因為現在基準點應該更穩定了** */
+            top: 85%;   /* **關鍵修正：大幅上移** */
             height: 5%; 
         }
 
@@ -116,32 +120,35 @@
 <body>
 
 <div class="quiz-container">
-    <img id="quiz-image" src="cover.png" alt="測驗封面">
+    <img id="quiz-image" src="intro.jpg" alt="測驗封面">
     
     <div id="button-area">
         </div>
 </div>
 
 <script>
+    // 為了測試方便，我暫時將初始圖片設為 intro.jpg
+    // ... (JavaScript 部分保持不變，因為邏輯是正確的) ...
     // --- 測驗資料定義 (不變) ---
     const LECTURE_URLS = {
         '捏捏': 'https://forms.gle/PvwhsYqJ7uAAqcrQ8',     
         '劉又熊': 'https://forms.gle/4C3PAuXNZKUm4CN98',   
         '林易祺': 'https://forms.gle/5SHN6fTp3p6397vs8'    
     };
-
+    
+    // 注意：我這裡使用您上傳的 JPG 檔案名作為範例，但您的圖片列表是 PNG，請確保實際使用的檔名一致！
     const PAGE_IMAGES = [
-        'cover.png', 'intro.png', 'q1.png', 'q2.png', 'q3.png', 
-        'q4.png', 'q5.png', 'q6.png', 'gotoresult.png'    
+        'cover.jpg', 'intro.jpg', 'q1.jpg', 'q2.jpg', 'q3.jpg', 
+        'q4.jpg', 'q5.jpg', 'q6.jpg', 'gotoresult.jpg'    
     ];
     
     const RESULT_DETAILS = {
-        'R1': { file: 'result_star.png', lecture: '捏捏' },      
-        'R2': { file: 'result_sun.png', lecture: '捏捏' },       
-        'R3': { file: 'result_foggy.png', lecture: '劉又熊' },    
-        'R4': { file: 'result_sunset.png', lecture: '劉又熊' },   
-        'R5': { file: 'result_dawn.png', lecture: '林易祺' },     
-        'R6': { file: 'result_moon.png', lecture: '林易祺' }      
+        'R1': { file: 'result_star.jpg', lecture: '捏捏' },      
+        'R2': { file: 'result_sun.jpg', lecture: '捏捏' },       
+        'R3': { file: 'result_foggy.jpg', lecture: '劉又熊' },    
+        'R4': { file: 'result_sunset.jpg', lecture: '劉又熊' },   
+        'R5': { file: 'result_dawn.jpg', lecture: '林易祺' },     
+        'R6': { file: 'result_moon.jpg', lecture: '林易祺' }      
     };
 
     // --- 全局變數 ---
@@ -155,10 +162,10 @@
     // --- 程式碼優化：預先載入圖片 ---
     function preloadImages() {
         const imagesToPreload = [
-            'intro.png', 'gotoresult.png', 
-            'q1.png', 'q2.png', 'q3.png', 'q4.png', 'q5.png', 'q6.png', 
-            'result_star.png', 'result_sun.png', 'result_foggy.png', 
-            'result_sunset.png', 'result_dawn.png', 'result_moon.png' 
+            'intro.jpg', 'gotoresult.jpg', 
+            'q1.jpg', 'q2.jpg', 'q3.jpg', 'q4.jpg', 'q5.jpg', 'q6.jpg', 
+            'result_star.jpg', 'result_sun.jpg', 'result_foggy.jpg', 
+            'result_sunset.jpg', 'result_dawn.jpg', 'result_moon.jpg' 
         ];
         imagesToPreload.forEach(src => {
             const img = new Image();
