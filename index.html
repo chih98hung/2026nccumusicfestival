@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>風塵卜卜 - 命運測驗 (最終修正: 副檔名)</title>
+    <title>風塵卜卜</title>
     <style>
         /* CSS: 保持不變 (圖片載入優化、按鈕位置修正) */
         html, body {
@@ -167,7 +167,7 @@
 </div>
 
 <div class="quiz-container">
-    <img id="quiz-image" src="cover.jpg" alt="測驗封面">
+    <img id="quiz-image" src="cover.png" alt="測驗封面">
     
     <div id="button-area">
         </div>
@@ -183,17 +183,17 @@
     };
 
     const PAGE_IMAGES = [
-        'cover.jpg', 'intro.jpg', 'q1.jpg', 'q2.jpg', 'q3.jpg', 
-        'q4.jpg', 'q5.jpg', 'q6.jpg', 'gotoresult.jpg'    
+        'cover.png', 'intro.png', 'q1.png', 'q2.png', 'q3.png', 
+        'q4.png', 'q5.png', 'q6.png', 'gotoresult.png'    
     ];
     
     const RESULT_DETAILS = {
-        'R1': { file: 'result_star.jpg', lecture: '捏捏' },      // 晨星
-        'R2': { file: 'result_sun.jpg', lecture: '捏捏' },       // 朝陽
-        'R3': { file: 'result_foggy.jpg', lecture: '劉又熊' },    // 靜霧
-        'R4': { file: 'result_sunset.jpg', lecture: '劉又熊' },   // 餘暉
-        'R5': { file: 'result_dawn.jpg', lecture: '林易祺' },     // 晨曦
-        'R6': { file: 'result_moon.jpg', lecture: '林易祺' }      // 幻月
+        'R1': { file: 'result_star.png', lecture: '捏捏' },      // 晨星
+        'R2': { file: 'result_sun.png', lecture: '捏捏' },       // 朝陽
+        'R3': { file: 'result_foggy.png', lecture: '劉又熊' },    // 靜霧
+        'R4': { file: 'result_sunset.png', lecture: '劉又熊' },   // 餘暉
+        'R5': { file: 'result_dawn.png', lecture: '林易祺' },     // 晨曦
+        'R6': { file: 'result_moon.png', lecture: '林易祺' }      // 幻月
     };
 
     // --- 計分對應表 (保持不變) ---
@@ -372,3 +372,4 @@
         renderStartButton(() => {
             const lectureUrl = LECTURE_URLS[result.lecture];
             window.open(
+
